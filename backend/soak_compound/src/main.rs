@@ -4,7 +4,7 @@ mod migrator;
 mod entities;
 mod schema;
 
-use async_graphql::{http::graphiql_source, EmptyMutation, EmptySubscription, Schema};
+use async_graphql::{EmptySubscription, Schema};
 use sea_orm::{ConnectOptions, Database, DatabaseConnection, DbErr, TransactionError};
 use sea_orm_migration::MigratorTrait;
 use async_graphql_rocket::*;
@@ -14,7 +14,7 @@ use schema::*;
 
 use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
 
-type SchemaType = Schema<RootQuery, EmptyMutation, EmptySubscription>;
+type SchemaType = Schema<RootQuery, RootMutation, EmptySubscription>;
 
 async fn setup_database() -> Result<DatabaseConnection, TransactionError<DbErr>> {
 
@@ -53,7 +53,7 @@ async fn rocket() -> _{
     let db = setup_database().await.unwrap();
     // run_migration(&db).await.unwrap();
 
-    let schema = Schema::build(RootQuery, EmptyMutation, EmptySubscription)
+    let schema = Schema::build(RootQuery, RootMutation, EmptySubscription)
         .data(db)
         .finish();
 
