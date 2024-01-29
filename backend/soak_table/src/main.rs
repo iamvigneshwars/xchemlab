@@ -4,6 +4,7 @@
 mod entities;
 mod migrator;
 mod graphql;
+mod resolvers;
 
 use std::net::{SocketAddr, SocketAddrV4, Ipv4Addr};
 use axum::{routing::get, Router, Server};
