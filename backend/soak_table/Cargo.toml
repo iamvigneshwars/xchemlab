@@ -10,3 +10,5 @@ sea-orm ={ workspace = true, features = ["sqlx-postgres"]}
 axum = { workspace = true }
 tokio ={ workspace = true }
 sea-orm-migration ={ workspace = true }
+async-graphql ={ workspace = true }
+graphql_endpoints = { path = "../graphql_endpoints" }
