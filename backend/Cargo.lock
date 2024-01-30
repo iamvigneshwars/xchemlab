@@ -3951,6 +3951,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "soak_table"
+version = "0.1.0"
+dependencies = [
+ "async-graphql",
+ "axum",
+ "graphql_endpoints",
+ "sea-orm",
+ "sea-orm-migration",
+ "tokio",
+]
+
+[[package]]
 name = "soakdb_io"
 version = "0.1.0"
 dependencies = [

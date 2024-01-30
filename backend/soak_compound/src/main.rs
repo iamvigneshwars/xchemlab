@@ -1,64 +1,58 @@
-// src/main.rs
+// main.rs
+// use crate::entities::wells;
 
-mod migrator;
 mod entities;
-mod schema;
+mod graphql;
+mod migrator;
+mod resolvers;
 
-use async_graphql::{EmptySubscription, Schema};
+use axum::{routing::get, Router, Server};
+use graphql::{root_schema_builder, RootSchema};
+use graphql_endpoints::{GraphQLHandler, GraphQLSubscription, GraphiQLHandler};
 use sea_orm::{ConnectOptions, Database, DatabaseConnection, DbErr, TransactionError};
 use sea_orm_migration::MigratorTrait;
-use async_graphql_rocket::*;
-// use rocket::*;
-use rocket::{response::content, *};
-use schema::*;
-
-use async_graphql::http::{playground_source, GraphQLPlaygroundConfig};
-
-type SchemaType = Schema<RootQuery, RootMutation, EmptySubscription>;
+use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
 
 async fn setup_database() -> Result<DatabaseConnection, TransactionError<DbErr>> {
+    let db_url =
+        ConnectOptions::new("postgres://postgres:password@postgres/soak_table".to_string());
 
-    let db_url = ConnectOptions::new("postgres://postgres:password@postgres/soak_compound".to_string());
     let db = Database::connect(db_url).await?;
+
+    migrator::Migrator::up(&db, None).await?;
+
     Ok(db)
-
 }
 
-async fn run_migration(db: &DatabaseConnection) -> Result<(), DbErr> {
+fn setup_router(schema: RootSchema) -> Router {
+    const GRAPHQL_ENDPOINT: &str = "/";
+    const SUBSCRIPTION_ENDPOINT: &str = "/ws";
 
-    // let schema_manager = SchemaManager::new(db);
-    migrator::Migrator::refresh(db).await?;
-    Ok(())
+    Router::new()
+        .route(
+            GRAPHQL_ENDPOINT,
+            get(GraphiQLHandler::new(
+                GRAPHQL_ENDPOINT,
+                SUBSCRIPTION_ENDPOINT,
+            ))
+            .post(GraphQLHandler::new(schema.clone())),
+        )
+        .route_service(SUBSCRIPTION_ENDPOINT, GraphQLSubscription::new(schema))
 }
 
-#[get("/")]
-async fn index() -> &'static str {
-    "Hello"
+async fn serve(router: Router) {
+    let socket_addr: SocketAddr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, 80));
+    println!("GraphiQL IDE: {}", socket_addr);
+    Server::bind(&socket_addr)
+        .serve(router.into_make_service())
+        .await
+        .unwrap();
 }
 
-#[rocket::post("/graphql", data = "<request>", format = "application/json")]
-async fn graphql_request(schema: &State<SchemaType>, request: GraphQLRequest) -> GraphQLResponse {
-    request.execute(schema.inner()).await
-}
-
-#[rocket::get("/graphql")]
-fn graphql_playground() -> content::RawHtml<String> {
-    content::RawHtml(playground_source(GraphQLPlaygroundConfig::new("/graphql")))
-}
-
-
-// #[tokio::main]
-#[launch]
-async fn rocket() -> _{
+#[tokio::main]
+async fn main() {
     let db = setup_database().await.unwrap();
-    // run_migration(&db).await.unwrap();
-
-    let schema = Schema::build(RootQuery, RootMutation, EmptySubscription)
-        .data(db)
-        .finish();
-
-    rocket::build()
-        .manage(schema)
-        // .mount("/", routes![graphql_request])
-        .mount("/", routes![index, graphql_request, graphql_playground])
+    let schema = root_schema_builder().data(db).finish();
+    let router = setup_router(schema);
+    serve(router).await;
 }
