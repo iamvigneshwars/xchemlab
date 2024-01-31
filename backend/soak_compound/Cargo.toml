@@ -12,3 +12,7 @@ tokio ={ workspace = true }
 sea-orm-migration ={ workspace = true }
 async-graphql ={ workspace = true }
 graphql_endpoints = { path = "../graphql_endpoints" }
+dotenvy ={ workspace = true }
+clap ={ workspace = true }
+opa_client ={ path = "../opa_client", features = ["graphql"]}
+url ={ workspace = true }

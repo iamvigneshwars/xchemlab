@@ -3,6 +3,7 @@
 use crate::entities::wells;
 use async_graphql::{Context, Object};
 use sea_orm::{ActiveValue, DatabaseConnection, DbErr, EntityTrait};
+use opa_client::subject_authorization;
 
 #[derive(Debug, Clone, Default)]
 pub struct WellQuery;
@@ -12,9 +13,10 @@ pub struct WellMutation;
 
 #[Object]
 impl WellQuery {
-    async fn wells(&self, ctx: &Context<'_>) -> async_graphql::Result<Vec<wells::Model>, DbErr> {
+    async fn wells(&self, ctx: &Context<'_>) -> async_graphql::Result<Vec<wells::Model>> {
+        subject_authorization!("xchemlab.soak_compound.read_well", ctx).await?;
         let db = ctx.data::<DatabaseConnection>().unwrap();
-        wells::Entity::find().all(db).await
+        Ok(wells::Entity::find().all(db).await?)
     }
 }
 
@@ -26,8 +28,8 @@ impl WellMutation {
         plate: String,
         pos: String,
     ) -> async_graphql::Result<wells::Model> {
+        subject_authorization!("xchemlab.soak_compound.write_well", ctx).await?;
         let db = ctx.data::<DatabaseConnection>().unwrap();
-
         let well = wells::ActiveModel {
             plate: ActiveValue::Set(plate),
             pos: ActiveValue::Set(pos),

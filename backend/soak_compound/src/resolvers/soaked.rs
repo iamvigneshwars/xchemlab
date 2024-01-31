@@ -3,6 +3,7 @@
 use crate::entities::{compounds, soaked, wells};
 use async_graphql::{ComplexObject, Context, Object, SimpleObject};
 use sea_orm::{prelude::*, ActiveValue};
+use opa_client::subject_authorization;
 
 #[derive(SimpleObject)]
 pub struct CompoundWithVolume {
@@ -19,11 +20,14 @@ pub struct SoakedMutation;
 #[ComplexObject]
 impl soaked::Model {
     async fn wells(&self, ctx: &Context<'_>) -> async_graphql::Result<Vec<wells::Model>> {
+        subject_authorization!("xchemlab.soak_compound.read_well", ctx).await?;
         let db = ctx.data::<DatabaseConnection>().unwrap();
         Ok(self.find_related(wells::Entity).all(db).await?)
+
     }
 
     async fn compounds(&self, ctx: &Context<'_>) -> async_graphql::Result<Vec<compounds::Model>> {
+        subject_authorization!("xchemlab.soak_compound.read_compound", ctx).await?;
         let db = ctx.data::<DatabaseConnection>().unwrap();
         Ok(self.find_related(compounds::Entity).all(db).await?)
     }
@@ -31,16 +35,18 @@ impl soaked::Model {
 
 #[Object]
 impl SoakedQuery {
-    async fn soaked(&self, ctx: &Context<'_>) -> async_graphql::Result<Vec<soaked::Model>, DbErr> {
+    async fn soaked(&self, ctx: &Context<'_>) -> async_graphql::Result<Vec<soaked::Model>> {
+        subject_authorization!("xchemlab.soak_compound.read_soaked", ctx).await?;
         let db = ctx.data::<DatabaseConnection>().unwrap();
-        soaked::Entity::find().all(db).await
+        Ok(soaked::Entity::find().all(db).await?)
     }
 
     async fn compounds_in_well(
         &self,
         ctx: &Context<'_>,
         well_id: i32,
-    ) -> async_graphql::Result<Vec<CompoundWithVolume>, DbErr> {
+    ) -> async_graphql::Result<Vec<CompoundWithVolume>> {
+        subject_authorization!("xchemlab.soak_compound.read_soaked", ctx).await?;
         let db = ctx.data::<DatabaseConnection>().unwrap();
         let soaked_wells = soaked::Entity::find()
             .filter(soaked::Column::WellId.eq(well_id))
@@ -75,6 +81,7 @@ impl SoakedMutation {
         compoundid: i32,
         volume: f64,
     ) -> async_graphql::Result<soaked::Model> {
+        subject_authorization!("xchemlab.soak_compound.write_soaked", ctx).await?;
         let db = ctx.data::<DatabaseConnection>().unwrap();
         let soaked = soaked::ActiveModel {
             well_id: ActiveValue::Set(wellid),

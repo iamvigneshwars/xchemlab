@@ -3956,10 +3956,14 @@ version = "0.1.0"
 dependencies = [
  "async-graphql",
  "axum",
+ "clap 4.4.17",
+ "dotenvy",
  "graphql_endpoints",
+ "opa_client",
  "sea-orm",
  "sea-orm-migration",
  "tokio",
+ "url",
 ]
 
 [[package]]

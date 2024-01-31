@@ -1,6 +1,7 @@
 // main.rs
-// use crate::entities::wells;
-
+#![forbid(unsafe_code)]
+#![allow(dead_code)]
+#![allow(unused_imports)]
 mod entities;
 mod graphql;
 mod migrator;
@@ -11,7 +12,44 @@ use graphql::{root_schema_builder, RootSchema};
 use graphql_endpoints::{GraphQLHandler, GraphQLSubscription, GraphiQLHandler};
 use sea_orm::{ConnectOptions, Database, DatabaseConnection, DbErr, TransactionError};
 use sea_orm_migration::MigratorTrait;
-use std::net::{Ipv4Addr, SocketAddr, SocketAddrV4};
+use opa_client::OPAClient;
+use clap::Parser;
+use url::Url;
+use std::{
+    path::PathBuf,
+    fs::File,
+    net::{Ipv4Addr, SocketAddr, SocketAddrV4},
+    io::Write,
+};
+
+
+#[derive(Debug, Parser)]
+#[command(author, version, about, long_about = None)]
+#[allow(clippy::large_enum_variant)]
+enum Cli {
+    Serve(ServeArgs),
+    Schema(SchemaArgs),
+}
+
+#[derive(Debug, Parser)]
+struct ServeArgs {
+
+    #[arg(short, long, default_value_t = 80)]
+    port: u16,
+    #[arg(long, env)]
+    database_url: Url,
+    #[arg(long, env)]
+    opa_url: Url,
+
+}
+
+#[derive(Debug, Parser)]
+struct SchemaArgs {
+
+    #[arg(short, long)]
+    path: Option<PathBuf>,
+
+}
 
 async fn setup_database() -> Result<DatabaseConnection, TransactionError<DbErr>> {
     let db_url =
@@ -51,8 +89,33 @@ async fn serve(router: Router) {
 
 #[tokio::main]
 async fn main() {
-    let db = setup_database().await.unwrap();
-    let schema = root_schema_builder().data(db).finish();
-    let router = setup_router(schema);
-    serve(router).await;
+
+    dotenvy::dotenv().ok();
+    let args = Cli::parse();
+
+    match args {
+        Cli::Serve(args) => {
+
+            let db = setup_database().await.unwrap();
+            let opa_client = OPAClient::new(args.opa_url);
+            let schema = root_schema_builder()
+                .data(db)
+                .data(opa_client)
+                .finish();
+            let router = setup_router(schema);
+            serve(router).await;
+
+        }
+        Cli::Schema(args) => {
+            let schema = root_schema_builder().finish();
+            let schema_string = schema.sdl();
+            if let Some(path) = args.path {
+                let mut file = File::create(path).unwrap();
+                file.write_all(schema_string.as_bytes()).unwrap();
+            } else {
+                println!("{}", schema_string);
+            }
+        }
+    }
+
 }
