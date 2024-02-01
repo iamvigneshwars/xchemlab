@@ -8,20 +8,19 @@ mod migrator;
 mod resolvers;
 
 use axum::{routing::get, Router, Server};
+use clap::Parser;
 use graphql::{root_schema_builder, RootSchema};
 use graphql_endpoints::{GraphQLHandler, GraphQLSubscription, GraphiQLHandler};
+use opa_client::OPAClient;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection, DbErr, TransactionError};
 use sea_orm_migration::MigratorTrait;
-use opa_client::OPAClient;
-use clap::Parser;
-use url::Url;
 use std::{
-    path::PathBuf,
     fs::File,
-    net::{Ipv4Addr, SocketAddr, SocketAddrV4},
     io::Write,
+    net::{Ipv4Addr, SocketAddr, SocketAddrV4},
+    path::PathBuf,
 };
-
+use url::Url;
 
 #[derive(Debug, Parser)]
 #[command(author, version, about, long_about = None)]
@@ -33,27 +32,23 @@ enum Cli {
 
 #[derive(Debug, Parser)]
 struct ServeArgs {
-
     #[arg(short, long, default_value_t = 80)]
     port: u16,
     #[arg(long, env)]
     database_url: Url,
     #[arg(long, env)]
     opa_url: Url,
-
 }
 
 #[derive(Debug, Parser)]
 struct SchemaArgs {
-
     #[arg(short, long)]
     path: Option<PathBuf>,
-
 }
 
 async fn setup_database() -> Result<DatabaseConnection, TransactionError<DbErr>> {
     let db_url =
-        ConnectOptions::new("postgres://postgres:password@postgres/soak_table".to_string());
+        ConnectOptions::new("postgres://postgres:password@postgres/sok_compound".to_string());
 
     let db = Database::connect(db_url).await?;
 
@@ -89,22 +84,23 @@ async fn serve(router: Router) {
 
 #[tokio::main]
 async fn main() {
-
     dotenvy::dotenv().ok();
     let args = Cli::parse();
 
     match args {
         Cli::Serve(args) => {
+            let db = match setup_database().await {
+                Ok(db) => db,
+                Err(e) => {
+                    eprintln!("Database setup failed: {}", e);
+                    return;
+                }
+            };
 
-            let db = setup_database().await.unwrap();
             let opa_client = OPAClient::new(args.opa_url);
-            let schema = root_schema_builder()
-                .data(db)
-                .data(opa_client)
-                .finish();
+            let schema = root_schema_builder().data(db).data(opa_client).finish();
             let router = setup_router(schema);
             serve(router).await;
-
         }
         Cli::Schema(args) => {
             let schema = root_schema_builder().finish();
@@ -117,5 +113,4 @@ async fn main() {
             }
         }
     }
-
 }

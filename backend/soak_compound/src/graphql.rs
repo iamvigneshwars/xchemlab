@@ -1,8 +1,8 @@
 // src/graphql.rs
 
-use crate::resolvers::compound::{CompoundMutation, CompoundQuery};
-use crate::resolvers::soaked::{SoakedMutation, SoakedQuery};
-use crate::resolvers::wells::{WellMutation, WellQuery};
+use crate::resolvers::compound_lib_res::{CompoundMutation, CompoundQuery};
+use crate::resolvers::soaked_well_res::{SoakedMutation, SoakedQuery};
+use crate::resolvers::well_lib_res::{WellMutation, WellQuery};
 use async_graphql::{EmptySubscription, MergedObject, Schema, SchemaBuilder};
 
 #[derive(Debug, Clone, MergedObject, Default)]
@@ -20,4 +20,3 @@ pub fn root_schema_builder() -> SchemaBuilder<RootQuery, RootMutation, EmptySubs
         EmptySubscription,
     )
 }
-

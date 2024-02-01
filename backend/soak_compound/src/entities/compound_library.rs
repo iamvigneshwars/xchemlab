@@ -4,8 +4,8 @@ use async_graphql::SimpleObject;
 use sea_orm::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, SimpleObject)]
-#[graphql(name = "compounds")]
-#[sea_orm(table_name = "compounds")]
+#[graphql(name = "compound_library")]
+#[sea_orm(table_name = "compound_library")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: i32,

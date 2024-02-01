@@ -1,6 +1,6 @@
 // src/entities/soaked.rs
 
-use super::{compounds, wells};
+use super::{compound_library, well_library};
 use async_graphql::SimpleObject;
 use sea_orm::prelude::*;
 
@@ -19,26 +19,26 @@ pub struct Model {
 #[derive(Clone, Copy, Debug, EnumIter, DeriveRelation)]
 pub enum Relation {
     #[sea_orm(
-        belongs_to = "compounds::Entity",
+        belongs_to = "compound_library::Entity",
         from = "Column::CompoundId",
-        to = "compounds::Column::Id"
+        to = "compound_library::Column::Id"
     )]
     Compounds,
     #[sea_orm(
-        belongs_to = "wells::Entity",
+        belongs_to = "well_library::Entity",
         from = "Column::WellId",
-        to = "wells::Column::Id"
+        to = "well_library::Column::Id"
     )]
     Wells,
 }
 
-impl Related<compounds::Entity> for Entity {
+impl Related<compound_library::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Compounds.def()
     }
 }
 
-impl Related<wells::Entity> for Entity {
+impl Related<well_library::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Wells.def()
     }
