@@ -48,7 +48,7 @@ struct SchemaArgs {
 
 async fn setup_database() -> Result<DatabaseConnection, TransactionError<DbErr>> {
     let db_url =
-        ConnectOptions::new("postgres://postgres:password@postgres/sok_compound".to_string());
+        ConnectOptions::new("postgres://postgres:password@postgres/soak_compound".to_string());
 
     let db = Database::connect(db_url).await?;
 

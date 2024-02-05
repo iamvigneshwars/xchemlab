@@ -49,7 +49,7 @@ pub struct CompoundWithVolume {
 
 #[Object]
 impl SoakedQuery {
-    async fn soaked_wells(
+    async fn soaked_compounds(
         &self,
         ctx: &Context<'_>,
     ) -> async_graphql::Result<Vec<soaked_well::Model>> {
@@ -63,7 +63,7 @@ impl SoakedQuery {
         })
     }
 
-    async fn get_soaked_well(
+    async fn get_soaked(
         &self,
         ctx: &Context<'_>,
         id: i32,
@@ -81,7 +81,7 @@ impl SoakedQuery {
         Ok(soaked_well)
     }
 
-    async fn compounds_in_well(
+    async fn get_soaked_well(
         &self,
         ctx: &Context<'_>,
         well_id: i32,

@@ -48,7 +48,7 @@ impl WellQuery {
 
 #[Object]
 impl WellMutation {
-    async fn register_well(
+    async fn add_well(
         &self,
         ctx: &Context<'_>,
         plate: String,
