@@ -32,7 +32,7 @@ impl CompoundQuery {
         ctx: &Context<'_>,
         id: i32,
     ) -> async_graphql::Result<compound_library::Model> {
-        // subject_authorization!("xchemlab.soak_compound.read_compound", ctx).await?;
+        subject_authorization!("xchemlab.soak_compound.read_compound", ctx).await?;
         let db = ctx.data::<DatabaseConnection>().map_err(|e| {
             async_graphql::Error::new(format!("Database connection error: {:?}", e))
         })?;
@@ -54,7 +54,7 @@ impl CompoundMutation {
         ctx: &Context<'_>,
         name: String,
     ) -> async_graphql::Result<compound_library::Model> {
-        // subject_authorization!("xchemlab.soak_compound.write_compound", ctx).await?;
+        subject_authorization!("xchemlab.soak_compound.write_compound", ctx).await?;
         let db = ctx.data::<DatabaseConnection>().map_err(|e| {
             async_graphql::Error::new(format!("Database connection error: {:?}", e))
         })?;

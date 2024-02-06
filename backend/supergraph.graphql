@@ -264,11 +264,27 @@ type MountedPuck
 }
 
 type Mutation
+  @join__type(graph: PIN_PACKING)
   @join__type(graph: SOAK_SERVICE)
 {
-  addWell(plate: String!, pos: String!): well_library!
-  addCompound(name: String!): compound_library!
-  addSoaked(wellid: Int!, compoundid: Int!, volume: Float!): soaked!
+  createCrystal(well: WellInput!, crystalState: CrystalState!, compoundState: CompoundState!): Crystal! @join__field(graph: PIN_PACKING)
+  registerLibraryCane(barcode: String!): LibraryCane! @join__field(graph: PIN_PACKING)
+  updateLibraryCaneStatus(barcode: String!, status: CaneStatus!): LibraryCane! @join__field(graph: PIN_PACKING)
+  createCaneMount(barcode: String!): MountedCane! @join__field(graph: PIN_PACKING)
+  registerLibraryPuck(barcode: String!): LibraryPuck! @join__field(graph: PIN_PACKING)
+  updateLibraryPuckStatus(barcode: String!, status: PuckStatus!): LibraryPuck! @join__field(graph: PIN_PACKING)
+  createPuck(barcode: String!): MountedPuck! @join__field(graph: PIN_PACKING)
+  registerLibraryPin(
+    barcode: String!
+
+    """Mounting loop size in micrometers"""
+    loopSize: Int!
+  ): LibraryPin! @join__field(graph: PIN_PACKING)
+  updateLibraryPinStatus(barcode: String!, status: PinStatus!): LibraryPin! @join__field(graph: PIN_PACKING)
+  createPinMount(crystalId: UUID!, puckMountId: UUID!, puckLocation: Int!, barcode: String!): MountedPin! @join__field(graph: PIN_PACKING)
+  addWell(plate: String!, pos: String!): well_library! @join__field(graph: SOAK_SERVICE)
+  addCompound(name: String!): compound_library! @join__field(graph: SOAK_SERVICE)
+  addSoaked(wellid: Int!, compoundid: Int!, volume: Float!): soaked! @join__field(graph: SOAK_SERVICE)
 }
 
 """Information about pagination in a connection"""
@@ -325,26 +341,6 @@ type Query
   soakedCompounds: [soaked!]! @join__field(graph: SOAK_SERVICE)
   getSoaked(id: Int!): soaked! @join__field(graph: SOAK_SERVICE)
   getSoakedWell(wellId: Int!): [CompoundWithVolume!]! @join__field(graph: SOAK_SERVICE)
-}
-
-type RootMutation
-  @join__type(graph: PIN_PACKING)
-{
-  createCrystal(well: WellInput!, crystalState: CrystalState!, compoundState: CompoundState!): Crystal!
-  registerLibraryCane(barcode: String!): LibraryCane!
-  updateLibraryCaneStatus(barcode: String!, status: CaneStatus!): LibraryCane!
-  createCaneMount(barcode: String!): MountedCane!
-  registerLibraryPuck(barcode: String!): LibraryPuck!
-  updateLibraryPuckStatus(barcode: String!, status: PuckStatus!): LibraryPuck!
-  createPuck(barcode: String!): MountedPuck!
-  registerLibraryPin(
-    barcode: String!
-
-    """Mounting loop size in micrometers"""
-    loopSize: Int!
-  ): LibraryPin!
-  updateLibraryPinStatus(barcode: String!, status: PinStatus!): LibraryPin!
-  createPinMount(crystalId: UUID!, puckMountId: UUID!, puckLocation: Int!, barcode: String!): MountedPin!
 }
 
 type soaked

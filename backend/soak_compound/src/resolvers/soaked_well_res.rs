@@ -53,11 +53,10 @@ impl SoakedQuery {
         &self,
         ctx: &Context<'_>,
     ) -> async_graphql::Result<Vec<soaked_well::Model>> {
-        // subject_authorization!("xchemlab.soak_compound.read_soaked", ctx).await?;
+        subject_authorization!("xchemlab.soak_compound.read_soaked", ctx).await?;
         let db = ctx.data::<DatabaseConnection>().map_err(|e| {
             async_graphql::Error::new(format!("Database connection error: {:?}", e))
         })?;
-        // Ok(soaked_well::Entity::find().all(db).await?)
         soaked_well::Entity::find().all(db).await.map_err(|e| {
             async_graphql::Error::new(format!("Failed to fetch all soaked wells: {}", e))
         })
@@ -68,7 +67,7 @@ impl SoakedQuery {
         ctx: &Context<'_>,
         id: i32,
     ) -> async_graphql::Result<soaked_well::Model> {
-        // subject_authorization!("xchemlab.soak_compound.read_soaked", ctx).await?;
+        subject_authorization!("xchemlab.soak_compound.read_soaked", ctx).await?;
         let db = ctx.data::<DatabaseConnection>().unwrap();
         let soaked_well =
             soaked_well::Entity::find_by_id(id)
@@ -86,7 +85,7 @@ impl SoakedQuery {
         ctx: &Context<'_>,
         well_id: i32,
     ) -> async_graphql::Result<Vec<CompoundWithVolume>> {
-        // subject_authorization!("xchemlab.soak_compound.read_soaked", ctx).await?;
+        subject_authorization!("xchemlab.soak_compound.read_soaked", ctx).await?;
         let db = ctx.data::<DatabaseConnection>().map_err(|e| {
             async_graphql::Error::new(format!("Database connection error: {:?}", e))
         })?;
@@ -144,7 +143,7 @@ impl SoakedMutation {
         compoundid: i32,
         volume: f64,
     ) -> async_graphql::Result<soaked_well::Model> {
-        // subject_authorization!("xchemlab.soak_compound.write_soaked", ctx).await?;
+        subject_authorization!("xchemlab.soak_compound.write_soaked", ctx).await?;
         let db = ctx.data::<DatabaseConnection>().unwrap();
         let soaked = soaked_well::ActiveModel {
             well_id: ActiveValue::Set(wellid),

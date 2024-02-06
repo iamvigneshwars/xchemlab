@@ -14,7 +14,7 @@ pub struct WellMutation;
 #[Object]
 impl WellQuery {
     async fn wells(&self, ctx: &Context<'_>) -> async_graphql::Result<Vec<well_library::Model>> {
-        // subject_authorization!("xchemlab.soak_compound.read_well", ctx).await?;
+        subject_authorization!("xchemlab.soak_compound.read_well", ctx).await?;
         let db = ctx.data::<DatabaseConnection>().map_err(|e| {
             async_graphql::Error::new(format!("Database connection error: {:?}", e))
         })?;
@@ -30,7 +30,7 @@ impl WellQuery {
         ctx: &Context<'_>,
         id: i32,
     ) -> async_graphql::Result<well_library::Model> {
-        // subject_authorization!("xchemlab.soak_compound.read_well", ctx).await?;
+        subject_authorization!("xchemlab.soak_compound.read_well", ctx).await?;
         let db = ctx.data::<DatabaseConnection>().map_err(|e| {
             async_graphql::Error::new(format!("Database connection error: {:?}", e))
         })?;
@@ -54,7 +54,7 @@ impl WellMutation {
         plate: String,
         pos: String,
     ) -> async_graphql::Result<well_library::Model> {
-        // subject_authorization!("xchemlab.soak_compound.write_well", ctx).await?;
+        subject_authorization!("xchemlab.soak_compound.write_well", ctx).await?;
         let db = ctx.data::<DatabaseConnection>().map_err(|e| {
             async_graphql::Error::new(format!("Database connection error: {:?}", e))
         })?;
