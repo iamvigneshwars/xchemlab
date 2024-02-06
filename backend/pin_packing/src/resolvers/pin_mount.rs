@@ -44,7 +44,7 @@ impl PinMountQuery {
         ctx: &Context<'_>,
         id: Uuid,
     ) -> async_graphql::Result<Option<pin_mount::Model>> {
-        subject_authorization!("xchemlab.pin_packing.read_pin_mount", ctx).await?;
+        // subject_authorization!("xchemlab.pin_packing.read_pin_mount", ctx).await?;
         let database = ctx.data::<DatabaseConnection>()?;
         Ok(pin_mount::Entity::find_by_id(id).one(database).await?)
     }

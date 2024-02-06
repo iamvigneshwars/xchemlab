@@ -9,18 +9,19 @@ use crate::resolvers::{
 };
 use async_graphql::{EmptySubscription, MergedObject, Schema, SchemaBuilder};
 
-pub fn root_schema_builder() -> SchemaBuilder<RootQuery, RootMutation, EmptySubscription> {
+pub fn root_schema_builder() -> SchemaBuilder<Query, RootMutation, EmptySubscription> {
     Schema::build(
-        RootQuery::default(),
+        Query::default(),
         RootMutation::default(),
         EmptySubscription,
     )
+    .enable_federation()
 }
 
-pub type RootSchema = Schema<RootQuery, RootMutation, EmptySubscription>;
+pub type RootSchema = Schema<Query, RootMutation, EmptySubscription>;
 
 #[derive(Debug, Clone, MergedObject, Default)]
-pub struct RootQuery(
+pub struct Query(
     CrystalQuery,
     CaneLibraryQuery,
     CaneMountQuery,

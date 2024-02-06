@@ -6,17 +6,18 @@ use crate::resolvers::well_lib_res::{WellMutation, WellQuery};
 use async_graphql::{EmptySubscription, MergedObject, Schema, SchemaBuilder};
 
 #[derive(Debug, Clone, MergedObject, Default)]
-pub struct RootQuery(WellQuery, CompoundQuery, SoakedQuery);
+pub struct Query(WellQuery, CompoundQuery, SoakedQuery);
 
 #[derive(Debug, Clone, MergedObject, Default)]
-pub struct RootMutation(WellMutation, CompoundMutation, SoakedMutation);
+pub struct Mutation(WellMutation, CompoundMutation, SoakedMutation);
 
-pub type RootSchema = Schema<RootQuery, RootMutation, EmptySubscription>;
+pub type RootSchema = Schema<Query, Mutation, EmptySubscription>;
 
-pub fn root_schema_builder() -> SchemaBuilder<RootQuery, RootMutation, EmptySubscription> {
+pub fn root_schema_builder() -> SchemaBuilder<Query, Mutation, EmptySubscription> {
     Schema::build(
-        RootQuery::default(),
-        RootMutation::default(),
+        Query::default(),
+        Mutation::default(),
         EmptySubscription,
     )
+    .enable_federation()
 }

@@ -74,7 +74,7 @@ fn setup_router(schema: RootSchema) -> Router {
 }
 
 async fn serve(router: Router) {
-    let socket_addr: SocketAddr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, 80));
+    let socket_addr: SocketAddr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, 81));
     println!("GraphiQL IDE: {}", socket_addr);
     Server::bind(&socket_addr)
         .serve(router.into_make_service())

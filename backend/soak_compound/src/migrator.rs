@@ -2,7 +2,8 @@
 
 // mod entities;
 
-use crate::entities::{compound_library, soaked_well, well_library};
+// use crate::entities::{compound_library, soaked_well, well_library};
+use crate::entities::{compound_library, well_library};
 use axum::async_trait;
 use sea_orm::{DbErr, DeriveMigrationName, Schema};
 use sea_orm_migration::{MigrationTrait, MigratorTrait, SchemaManager};
@@ -33,9 +34,9 @@ impl MigrationTrait for Initial {
             .create_table(schema.create_table_from_entity(compound_library::Entity))
             .await?;
 
-        manager
-            .create_table(schema.create_table_from_entity(soaked_well::Entity))
-            .await?;
+        // manager
+        //     .create_table(schema.create_table_from_entity(soaked_well::Entity))
+        //     .await?;
 
         Ok(())
     }
