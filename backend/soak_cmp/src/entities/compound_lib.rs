@@ -1,4 +1,4 @@
-// src/entities/compounds.rs
+// src/entities/compound_library.rs
 
 use async_graphql::{Enum, SimpleObject};
 use sea_orm::prelude::*;
@@ -16,17 +16,16 @@ pub enum CompoundState {
     BadDispense,
     #[sea_orm(string_value = "Phase Separation")]
     PhaseSeparation,
-}   
+}
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, SimpleObject)]
-#[graphql(name = "compound_library", shareable)]
 #[sea_orm(table_name = "compound_library")]
+#[graphql(name = "compound_library", shareable)]
 pub struct Model {
     #[sea_orm(primary_key)]
-    #[graphql(shareable)]
     pub id: i32,
+    #[sea_orm(column_type = "Text", unique)]
     pub name: String,
-    #[graphql(external)]
     pub compound_state: CompoundState,
 }
 

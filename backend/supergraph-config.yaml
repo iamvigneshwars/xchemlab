@@ -1,18 +1,26 @@
 fedration_version : 2
 subgraphs:
-  soak_service:
-    routing_url: http://localhost:81/
-    request_transforms:
-      headers:
-        add:
-          Authorization: "{incoming:request:header:Authorization}"
-    schema: 
-      subgraph_url: http://localhost:81/
-  pin_packing:
+  # soak_service:
+  #   routing_url: http://localhost:81/
+  #   schema: 
+  #     subgraph_url: http://localhost:81/
+  # pin_packing:
+  #   routing_url: http://localhost:80/
+  #   schema: 
+  #     subgraph_url: http://localhost:80/
+  # compound_library:
+  #   routing_url: http://localhost:82/
+  #   schema: 
+  #     subgraph_url: http://localhost:82/
+  accounts:
     routing_url: http://localhost:80/
-    request_transforms:
-      headers:
-        add:
-          Authorization: "{incoming:request:header:Authorization}"
     schema: 
       subgraph_url: http://localhost:80/
+  products:
+    routing_url: http://localhost:81/
+    schema: 
+      subgraph_url: http://localhost:81/
+  reviews:
+    routing_url: http://localhost:82/
+    schema: 
+      subgraph_url: http://localhost:82/

@@ -13,6 +13,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "accounts"
+version = "0.1.0"
+dependencies = [
+ "async-graphql",
+ "axum",
+ "graphql_endpoints",
+ "sea-orm",
+ "tokio",
+]
+
+[[package]]
 name = "addr2line"
 version = "0.21.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3190,6 +3201,17 @@ dependencies = [
 ]
 
 [[package]]
+name = "products"
+version = "0.1.0"
+dependencies = [
+ "async-graphql",
+ "axum",
+ "graphql_endpoints",
+ "sea-orm",
+ "tokio",
+]
+
+[[package]]
 name = "quote"
 version = "1.0.35"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3384,6 +3406,17 @@ dependencies = [
  "wasm-bindgen-futures",
  "web-sys",
  "winreg",
+]
+
+[[package]]
+name = "reviews"
+version = "0.1.0"
+dependencies = [
+ "async-graphql",
+ "axum",
+ "graphql_endpoints",
+ "sea-orm",
+ "tokio",
 ]
 
 [[package]]
@@ -3952,6 +3985,22 @@ name = "smallvec"
 version = "1.11.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "62bb4feee49fdd9f707ef802e22365a35de4b7b299de4763d44bfea899442ff9"
+
+[[package]]
+name = "soak_cmp"
+version = "0.1.0"
+dependencies = [
+ "async-graphql",
+ "axum",
+ "clap 4.4.17",
+ "dotenvy",
+ "graphql_endpoints",
+ "opa_client",
+ "sea-orm",
+ "sea-orm-migration",
+ "tokio",
+ "url",
+]
 
 [[package]]
 name = "soak_compound"

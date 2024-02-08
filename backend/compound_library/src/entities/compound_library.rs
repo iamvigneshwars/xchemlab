@@ -25,6 +25,7 @@ pub struct Model {
     pub id: i32,
     #[sea_orm(column_type = "Text", unique)]
     pub name: String,
+    #[graphql(shareable)]
     pub compound_state: CompoundState,
 }
 
