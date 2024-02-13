@@ -1,7 +1,5 @@
 // main.rs
-#![forbid(unsafe_code)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
+
 mod entities;
 mod graphql;
 mod migrator;
@@ -11,7 +9,6 @@ use axum::{routing::get, Router, Server};
 use clap::Parser;
 use graphql::{root_schema_builder, RootSchema};
 use graphql_endpoints::{GraphQLHandler, GraphQLSubscription, GraphiQLHandler};
-use opa_client::OPAClient;
 use sea_orm::{ConnectOptions, Database, DatabaseConnection, DbErr, TransactionError};
 use sea_orm_migration::MigratorTrait;
 use std::{
@@ -48,12 +45,9 @@ struct SchemaArgs {
 
 async fn setup_database() -> Result<DatabaseConnection, TransactionError<DbErr>> {
     let db_url =
-        ConnectOptions::new("postgres://postgres:password@postgres/soak_compound".to_string());
-
+        ConnectOptions::new("postgres://postgres:password@postgres/compound_library".to_string());
     let db = Database::connect(db_url).await?;
-
     migrator::Migrator::up(&db, None).await?;
-
     Ok(db)
 }
 
@@ -74,7 +68,7 @@ fn setup_router(schema: RootSchema) -> Router {
 }
 
 async fn serve(router: Router) {
-    let socket_addr: SocketAddr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, 81));
+    let socket_addr: SocketAddr = SocketAddr::V4(SocketAddrV4::new(Ipv4Addr::UNSPECIFIED, 80));
     println!("GraphiQL IDE: {}", socket_addr);
     Server::bind(&socket_addr)
         .serve(router.into_make_service())
@@ -88,7 +82,7 @@ async fn main() {
     let args = Cli::parse();
 
     match args {
-        Cli::Serve(args) => {
+        Cli::Serve(_args) => {
             let db = match setup_database().await {
                 Ok(db) => db,
                 Err(e) => {
@@ -96,9 +90,7 @@ async fn main() {
                     return;
                 }
             };
-
-            let opa_client = OPAClient::new(args.opa_url);
-            let schema = root_schema_builder().data(db).data(opa_client).finish();
+            let schema = root_schema_builder().data(db).finish();
             let router = setup_router(schema);
             serve(router).await;
         }

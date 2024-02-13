@@ -1,0 +1,10 @@
+fedration_version : 2
+subgraphs:
+  pin_packing:
+    routing_url: http://localhost:80/
+    schema: 
+      subgraph_url: http://localhost:80/
+  soak_compound:
+    routing_url: http://localhost:81/
+    schema: 
+      subgraph_url: http://localhost:81/

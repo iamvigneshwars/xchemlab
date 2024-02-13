@@ -57,7 +57,6 @@ impl SoakedQuery {
         let db = ctx.data::<DatabaseConnection>().map_err(|e| {
             async_graphql::Error::new(format!("Database connection error: {:?}", e))
         })?;
-        // Ok(soaked_well::Entity::find().all(db).await?)
         soaked_well::Entity::find().all(db).await.map_err(|e| {
             async_graphql::Error::new(format!("Failed to fetch all soaked wells: {}", e))
         })

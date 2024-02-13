@@ -1,6 +1,6 @@
 // src/entities/compounds.rs
 
-use async_graphql::SimpleObject;
+use async_graphql::{Enum, SimpleObject};
 use sea_orm::prelude::*;
 
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel, SimpleObject)]

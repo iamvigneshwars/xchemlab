@@ -1,0 +1,385 @@
+schema
+  @link(url: "https://specs.apollo.dev/link/v1.0")
+  @link(url: "https://specs.apollo.dev/join/v0.3", for: EXECUTION)
+{
+  query: Query
+  mutation: Mutation
+}
+
+directive @join__enumValue(graph: join__Graph!) repeatable on ENUM_VALUE
+
+directive @join__field(graph: join__Graph, requires: join__FieldSet, provides: join__FieldSet, type: String, external: Boolean, override: String, usedOverridden: Boolean) repeatable on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+directive @join__graph(name: String!, url: String!) on ENUM_VALUE
+
+directive @join__implements(graph: join__Graph!, interface: String!) repeatable on OBJECT | INTERFACE
+
+directive @join__type(graph: join__Graph!, key: join__FieldSet, extension: Boolean! = false, resolvable: Boolean! = true, isInterfaceObject: Boolean! = false) repeatable on OBJECT | INTERFACE | UNION | ENUM | INPUT_OBJECT | SCALAR
+
+directive @join__unionMember(graph: join__Graph!, member: String!) repeatable on UNION
+
+directive @link(url: String, as: String, for: link__Purpose, import: [link__Import]) repeatable on SCHEMA
+
+enum CaneStatus
+  @join__type(graph: PIN_PACKING)
+{
+  READY @join__enumValue(graph: PIN_PACKING)
+  FILLING @join__enumValue(graph: PIN_PACKING)
+  AWAY @join__enumValue(graph: PIN_PACKING)
+  BROKEN @join__enumValue(graph: PIN_PACKING)
+}
+
+type compound_library
+  @join__type(graph: SOAK_COMPOUND)
+{
+  id: Int!
+  name: String!
+  compoundState: CompoundState!
+}
+
+enum CompoundState
+  @join__type(graph: PIN_PACKING)
+  @join__type(graph: SOAK_COMPOUND)
+{
+  NORMAL @join__enumValue(graph: PIN_PACKING) @join__enumValue(graph: SOAK_COMPOUND)
+  CRYSTALINE @join__enumValue(graph: PIN_PACKING) @join__enumValue(graph: SOAK_COMPOUND)
+  PRECIPITATED @join__enumValue(graph: PIN_PACKING) @join__enumValue(graph: SOAK_COMPOUND)
+  BAD_DISPENSE @join__enumValue(graph: PIN_PACKING) @join__enumValue(graph: SOAK_COMPOUND)
+  PHASE_SEPARATION @join__enumValue(graph: PIN_PACKING) @join__enumValue(graph: SOAK_COMPOUND)
+}
+
+type CompoundWithVolume
+  @join__type(graph: SOAK_COMPOUND)
+{
+  compounds: compound_library!
+  volume: Float!
+}
+
+type Crystal
+  @join__type(graph: PIN_PACKING)
+{
+  id: UUID!
+  plate: UUID!
+  well: Int!
+  crystalState: CrystalState!
+  compoundState: CompoundState!
+  timestamp: DateTime!
+  operatorId: String!
+  pinMount: MountedPin
+}
+
+enum CrystalState
+  @join__type(graph: PIN_PACKING)
+{
+  NORMAL @join__enumValue(graph: PIN_PACKING)
+  MELTED @join__enumValue(graph: PIN_PACKING)
+  CRACKED @join__enumValue(graph: PIN_PACKING)
+  JELLY @join__enumValue(graph: PIN_PACKING)
+  COLOURED @join__enumValue(graph: PIN_PACKING)
+}
+
+"""An [`async_graphql`] input object for specifying page by cursor"""
+input CursorInput
+  @join__type(graph: PIN_PACKING)
+{
+  after: String
+  before: String
+  first: Int
+  last: Int
+}
+
+"""
+Implement the DateTime<Utc> scalar
+
+The input/output is a string in RFC3339 format.
+"""
+scalar DateTime
+  @join__type(graph: PIN_PACKING)
+
+scalar join__FieldSet
+
+enum join__Graph {
+  PIN_PACKING @join__graph(name: "pin_packing", url: "http://localhost:80/")
+  SOAK_COMPOUND @join__graph(name: "soak_compound", url: "http://localhost:81/")
+}
+
+type LibraryCane
+  @join__type(graph: PIN_PACKING)
+{
+  barcode: String!
+  status: CaneStatus!
+  mounts: [MountedCane!]!
+}
+
+type LibraryCaneConnection
+  @join__type(graph: PIN_PACKING)
+{
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [LibraryCaneEdge!]!
+}
+
+"""An edge in a connection."""
+type LibraryCaneEdge
+  @join__type(graph: PIN_PACKING)
+{
+  """The item at the end of the edge"""
+  node: LibraryCane!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type LibraryPin
+  @join__type(graph: PIN_PACKING)
+{
+  barcode: String!
+
+  """Mounting loop size in micrometers."""
+  loopSize: Int!
+  status: PinStatus!
+  mounts: [MountedPin!]!
+}
+
+type LibraryPinConnection
+  @join__type(graph: PIN_PACKING)
+{
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [LibraryPinEdge!]!
+}
+
+"""An edge in a connection."""
+type LibraryPinEdge
+  @join__type(graph: PIN_PACKING)
+{
+  """The item at the end of the edge"""
+  node: LibraryPin!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type LibraryPuck
+  @join__type(graph: PIN_PACKING)
+{
+  barcode: String!
+  status: PuckStatus!
+  mounts: [MountedPuck!]!
+}
+
+type LibraryPuckConnection
+  @join__type(graph: PIN_PACKING)
+{
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [LibraryPuckEdge!]!
+}
+
+"""An edge in a connection."""
+type LibraryPuckEdge
+  @join__type(graph: PIN_PACKING)
+{
+  """The item at the end of the edge"""
+  node: LibraryPuck!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+scalar link__Import
+
+enum link__Purpose {
+  """
+  `SECURITY` features provide metadata necessary to securely resolve fields.
+  """
+  SECURITY
+
+  """
+  `EXECUTION` features provide metadata necessary for operation execution.
+  """
+  EXECUTION
+}
+
+type MountedCane
+  @join__type(graph: PIN_PACKING)
+{
+  id: UUID!
+  barcode: String!
+  timestamp: DateTime!
+  operatorId: String!
+  pucks: [MountedPuck!]!
+}
+
+type MountedCaneConnection
+  @join__type(graph: PIN_PACKING)
+{
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [MountedCaneEdge!]!
+}
+
+"""An edge in a connection."""
+type MountedCaneEdge
+  @join__type(graph: PIN_PACKING)
+{
+  """The item at the end of the edge"""
+  node: MountedCane!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+type MountedPin
+  @join__type(graph: PIN_PACKING)
+{
+  id: UUID!
+  crystalId: UUID!
+  puckMountId: UUID!
+  puckLocation: Int!
+  barcode: String!
+  timestamp: DateTime!
+  operatorId: String!
+  crystal: Crystal!
+  puck: MountedPuck!
+}
+
+type MountedPuck
+  @join__type(graph: PIN_PACKING)
+{
+  id: UUID!
+  caneMountId: UUID
+  caneLocation: Int
+  barcode: String!
+  timestamp: DateTime!
+  operatorId: String!
+  pins: [MountedPin!]!
+  cane: MountedCane
+}
+
+type Mutation
+  @join__type(graph: PIN_PACKING)
+  @join__type(graph: SOAK_COMPOUND)
+{
+  createCrystal(well: WellInput!, crystalState: CrystalState!, compoundState: CompoundState!): Crystal! @join__field(graph: PIN_PACKING)
+  registerLibraryCane(barcode: String!): LibraryCane! @join__field(graph: PIN_PACKING)
+  updateLibraryCaneStatus(barcode: String!, status: CaneStatus!): LibraryCane! @join__field(graph: PIN_PACKING)
+  createCaneMount(barcode: String!): MountedCane! @join__field(graph: PIN_PACKING)
+  registerLibraryPuck(barcode: String!): LibraryPuck! @join__field(graph: PIN_PACKING)
+  updateLibraryPuckStatus(barcode: String!, status: PuckStatus!): LibraryPuck! @join__field(graph: PIN_PACKING)
+  createPuck(barcode: String!): MountedPuck! @join__field(graph: PIN_PACKING)
+  registerLibraryPin(
+    barcode: String!
+
+    """Mounting loop size in micrometers"""
+    loopSize: Int!
+  ): LibraryPin! @join__field(graph: PIN_PACKING)
+  updateLibraryPinStatus(barcode: String!, status: PinStatus!): LibraryPin! @join__field(graph: PIN_PACKING)
+  createPinMount(crystalId: UUID!, puckMountId: UUID!, puckLocation: Int!, barcode: String!): MountedPin! @join__field(graph: PIN_PACKING)
+  addWell(plate: String!, pos: String!): well_library! @join__field(graph: SOAK_COMPOUND)
+  addCompound(name: String!): compound_library! @join__field(graph: SOAK_COMPOUND)
+  addSoaked(wellid: Int!, compoundid: Int!, volume: Float!): soaked! @join__field(graph: SOAK_COMPOUND)
+}
+
+"""Information about pagination in a connection"""
+type PageInfo
+  @join__type(graph: PIN_PACKING)
+{
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+}
+
+enum PinStatus
+  @join__type(graph: PIN_PACKING)
+{
+  READY @join__enumValue(graph: PIN_PACKING)
+  OCCUPIED @join__enumValue(graph: PIN_PACKING)
+  DIRTY @join__enumValue(graph: PIN_PACKING)
+  BROKEN @join__enumValue(graph: PIN_PACKING)
+}
+
+enum PuckStatus
+  @join__type(graph: PIN_PACKING)
+{
+  READY @join__enumValue(graph: PIN_PACKING)
+  FILLING @join__enumValue(graph: PIN_PACKING)
+  AWAY @join__enumValue(graph: PIN_PACKING)
+  BROKEN @join__enumValue(graph: PIN_PACKING)
+}
+
+type Query
+  @join__type(graph: PIN_PACKING)
+  @join__type(graph: SOAK_COMPOUND)
+{
+  crystal(id: UUID!): Crystal @join__field(graph: PIN_PACKING)
+  libraryCanes(cursor: CursorInput!): LibraryCaneConnection! @join__field(graph: PIN_PACKING)
+  getCaneMount(id: UUID!): MountedCane @join__field(graph: PIN_PACKING)
+  getCaneMounts(cursor: CursorInput!): MountedCaneConnection! @join__field(graph: PIN_PACKING)
+  libraryPucks(cursor: CursorInput!): LibraryPuckConnection! @join__field(graph: PIN_PACKING)
+  getPuckMount(id: UUID!): MountedPuck @join__field(graph: PIN_PACKING)
+  libraryPins(cursor: CursorInput!): LibraryPinConnection! @join__field(graph: PIN_PACKING)
+  getPinMount(id: UUID!): MountedPin @join__field(graph: PIN_PACKING)
+  wells: [well_library!]! @join__field(graph: SOAK_COMPOUND)
+  getWell(id: Int!): well_library! @join__field(graph: SOAK_COMPOUND)
+  compounds: [compound_library!]! @join__field(graph: SOAK_COMPOUND)
+  getCompound(id: Int!): compound_library! @join__field(graph: SOAK_COMPOUND)
+  soakedCompounds: [soaked!]! @join__field(graph: SOAK_COMPOUND)
+  getSoaked(id: Int!): soaked! @join__field(graph: SOAK_COMPOUND)
+  getSoakedWell(wellId: Int!): [CompoundWithVolume!]! @join__field(graph: SOAK_COMPOUND)
+}
+
+type soaked
+  @join__type(graph: SOAK_COMPOUND)
+{
+  id: Int!
+  wellId: Int!
+  compoundId: Int!
+  volume: Float!
+  wells: [well_library!]!
+  compounds: [compound_library!]!
+}
+
+"""
+A UUID is a unique 128-bit number, stored as 16 octets. UUIDs are parsed as
+Strings within GraphQL. UUIDs are used to assign unique identifiers to
+entities without requiring a central allocating authority.
+
+# References
+
+* [Wikipedia: Universally Unique Identifier](http://en.wikipedia.org/wiki/Universally_unique_identifier)
+* [RFC4122: A Universally Unique IDentifier (UUID) URN Namespace](http://tools.ietf.org/html/rfc4122)
+"""
+scalar UUID
+  @join__type(graph: PIN_PACKING)
+
+type well_library
+  @join__type(graph: SOAK_COMPOUND)
+{
+  id: Int!
+  plate: String!
+  pos: String!
+}
+
+input WellInput
+  @join__type(graph: PIN_PACKING)
+{
+  plate: UUID!
+  well: Int!
+}
