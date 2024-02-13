@@ -27,44 +27,24 @@ impl CompoundQuery {
             .map_err(|e| async_graphql::Error::new(format!("Failed to fetch all compounds: {}", e)))
     }
 
-    #[graphql(entity)]
-    async fn get_compound_by_id(
+    async fn get_compound(
         &self,
         ctx: &Context<'_>,
-        #[graphql(key)]id: i32,
-    ) -> async_graphql::Result<Option<compound_library::Model>> {
-        get_compound_by_id_internal(ctx, id).await
+        id: i32,
+    ) -> async_graphql::Result<compound_library::Model> {
+        subject_authorization!("xchemlab.soak_compound.read_compound", ctx).await?;
+        let db = ctx.data::<DatabaseConnection>().map_err(|e| {
+            async_graphql::Error::new(format!("Database connection error: {:?}", e))
+        })?;
+        let compound = compound_library::Entity::find_by_id(id)
+            .one(db)
+            .await?
+            .ok_or(DbErr::RecordNotFound(format!(
+                "Compound not found with id {}",
+                id
+            )))?;
+        Ok(compound)
     }
-
-    // async fn get_compound(
-    //     &self,
-    //     ctx: &Context<'_>,
-    //     id: i32,
-    // ) -> async_graphql::Result<compound_library::Model> {
-    //     subject_authorization!("xchemlab.soak_compound.read_compound", ctx).await?;
-    //     let db = ctx.data::<DatabaseConnection>().map_err(|e| {
-    //         async_graphql::Error::new(format!("Database connection error: {:?}", e))
-    //     })?;
-    //     let compound = compound_library::Entity::find_by_id(id)
-    //         .one(db)
-    //         .await?
-    //         .ok_or(DbErr::RecordNotFound(format!(
-    //             "Compound not found with id {}",
-    //             id
-    //         )))?;
-    //     Ok(compound)
-    // }
-}
-
-async fn get_compound_by_id_internal(
-    ctx: &Context<'_>,
-    id: i32,
-) -> async_graphql::Result<Option<compound_library::Model>> {
-    let db = ctx
-        .data::<DatabaseConnection>()
-        .map_err(|e| async_graphql::Error::new(format!("Datbase connection error: {:?}", e)))?;
-
-    Ok(compound_library::Entity::find_by_id(id).one(db).await?)
 }
 
 #[Object]

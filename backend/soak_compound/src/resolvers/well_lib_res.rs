@@ -24,7 +24,6 @@ impl WellQuery {
             .map_err(|e| async_graphql::Error::new(format!("Failed to fetch all wells: {}", e)))
     }
 
-    // async fn get_well(&self, ctx: &Context<'_>, id: i32) -> async_graphql::Result<well_library::Model, DbErr> {
     async fn get_well(
         &self,
         ctx: &Context<'_>,

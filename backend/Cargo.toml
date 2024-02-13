@@ -11,7 +11,7 @@ members = [
     "soakdb_sync",
     "targeting",
     "the_paginator", "compound_library",
- "accounts", "products", "reviews", "soak_cmp", ]
+]
 resolver = "2"
 
 [workspace.dependencies]
