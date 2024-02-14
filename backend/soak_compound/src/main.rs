@@ -1,12 +1,11 @@
 // main.rs
 #![forbid(unsafe_code)]
-#![allow(dead_code)]
-#![allow(unused_imports)]
 mod entities;
 mod graphql;
 mod migrator;
 mod resolvers;
 
+use async_graphql::extensions::Tracing;
 use axum::{routing::get, Router, Server};
 use clap::Parser;
 use graphql::{root_schema_builder, RootSchema};
@@ -86,19 +85,20 @@ async fn serve(router: Router) {
 async fn main() {
     dotenvy::dotenv().ok();
     let args = Cli::parse();
+    let tracing_subscriber = tracing_subscriber::FmtSubscriber::builder()
+        .with_env_filter(tracing_subscriber::EnvFilter::from_default_env())
+        .finish();
+    tracing::subscriber::set_global_default(tracing_subscriber).unwrap();
 
     match args {
         Cli::Serve(args) => {
-            let db = match setup_database().await {
-                Ok(db) => db,
-                Err(e) => {
-                    eprintln!("Database setup failed: {}", e);
-                    return;
-                }
-            };
-
+            let db = setup_database().await.unwrap();
             let opa_client = OPAClient::new(args.opa_url);
-            let schema = root_schema_builder().data(db).data(opa_client).finish();
+            let schema = root_schema_builder()
+                .data(db)
+                .data(opa_client)
+                .extension(Tracing)
+                .finish();
             let router = setup_router(schema);
             serve(router).await;
         }

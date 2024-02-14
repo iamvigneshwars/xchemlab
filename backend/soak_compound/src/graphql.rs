@@ -14,10 +14,5 @@ pub struct Mutation(WellMutation, CompoundMutation, SoakedMutation);
 pub type RootSchema = Schema<Query, Mutation, EmptySubscription>;
 
 pub fn root_schema_builder() -> SchemaBuilder<Query, Mutation, EmptySubscription> {
-    Schema::build(
-        Query::default(),
-        Mutation::default(),
-        EmptySubscription,
-    )
-    .enable_federation()
+    Schema::build(Query::default(), Mutation::default(), EmptySubscription).enable_federation()
 }

@@ -16,3 +16,6 @@ dotenvy ={ workspace = true }
 clap ={ workspace = true }
 opa_client ={ path = "../opa_client", features = ["graphql"]}
 url ={ workspace = true }
+tracing = { workspace = true }
+tracing-subscriber = { workspace = true }
+uuid = { workspace = true , features = ["v7"]}

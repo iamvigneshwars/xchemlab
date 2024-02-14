@@ -4,6 +4,7 @@ use crate::entities::well_library;
 use async_graphql::{Context, Object};
 use opa_client::subject_authorization;
 use sea_orm::{ActiveValue, DatabaseConnection, DbErr, EntityTrait};
+use uuid::Uuid;
 
 #[derive(Debug, Clone, Default)]
 pub struct WellQuery;
@@ -15,9 +16,7 @@ pub struct WellMutation;
 impl WellQuery {
     async fn wells(&self, ctx: &Context<'_>) -> async_graphql::Result<Vec<well_library::Model>> {
         subject_authorization!("xchemlab.soak_compound.read_well", ctx).await?;
-        let db = ctx.data::<DatabaseConnection>().map_err(|e| {
-            async_graphql::Error::new(format!("Database connection error: {:?}", e))
-        })?;
+        let db = ctx.data::<DatabaseConnection>()?;
         well_library::Entity::find()
             .all(db)
             .await
@@ -27,12 +26,10 @@ impl WellQuery {
     async fn get_well(
         &self,
         ctx: &Context<'_>,
-        id: i32,
+        id: Uuid,
     ) -> async_graphql::Result<well_library::Model> {
         subject_authorization!("xchemlab.soak_compound.read_well", ctx).await?;
-        let db = ctx.data::<DatabaseConnection>().map_err(|e| {
-            async_graphql::Error::new(format!("Database connection error: {:?}", e))
-        })?;
+        let db = ctx.data::<DatabaseConnection>()?;
         let well =
             well_library::Entity::find_by_id(id)
                 .one(db)
@@ -54,13 +51,11 @@ impl WellMutation {
         pos: String,
     ) -> async_graphql::Result<well_library::Model> {
         subject_authorization!("xchemlab.soak_compound.write_well", ctx).await?;
-        let db = ctx.data::<DatabaseConnection>().map_err(|e| {
-            async_graphql::Error::new(format!("Database connection error: {:?}", e))
-        })?;
+        let db = ctx.data::<DatabaseConnection>()?;
         let well = well_library::ActiveModel {
+            id : ActiveValue::Set(Uuid::now_v7()),
             plate: ActiveValue::Set(plate),
             pos: ActiveValue::Set(pos),
-            ..Default::default()
         };
 
         well_library::Entity::insert(well)
