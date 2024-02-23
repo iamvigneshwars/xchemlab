@@ -1,0 +1,149 @@
+schema
+  @link(url: "https://specs.apollo.dev/link/v1.0")
+  @link(url: "https://specs.apollo.dev/join/v0.3", for: EXECUTION)
+{
+  query: Query
+  mutation: Mutation
+}
+
+directive @join__enumValue(graph: join__Graph!) repeatable on ENUM_VALUE
+
+directive @join__field(graph: join__Graph, requires: join__FieldSet, provides: join__FieldSet, type: String, external: Boolean, override: String, usedOverridden: Boolean) repeatable on FIELD_DEFINITION | INPUT_FIELD_DEFINITION
+
+directive @join__graph(name: String!, url: String!) on ENUM_VALUE
+
+directive @join__implements(graph: join__Graph!, interface: String!) repeatable on OBJECT | INTERFACE
+
+directive @join__type(graph: join__Graph!, key: join__FieldSet, extension: Boolean! = false, resolvable: Boolean! = true, isInterfaceObject: Boolean! = false) repeatable on OBJECT | INTERFACE | UNION | ENUM | INPUT_OBJECT | SCALAR
+
+directive @join__unionMember(graph: join__Graph!, member: String!) repeatable on UNION
+
+directive @link(url: String, as: String, for: link__Purpose, import: [link__Import]) repeatable on SCHEMA
+
+type accounts
+  @join__type(graph: ACCOUNTS, key: "id")
+  @join__type(graph: REVIEWS, key: "id")
+{
+  id: Int!
+  username: String! @join__field(graph: ACCOUNTS)
+  reviewcount: Int! @join__field(graph: ACCOUNTS)
+  review: [reviews!]! @join__field(graph: REVIEWS)
+}
+
+type accountsConnection
+  @join__type(graph: ACCOUNTS)
+{
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [accountsEdge!]!
+}
+
+"""An edge in a connection."""
+type accountsEdge
+  @join__type(graph: ACCOUNTS)
+{
+  """The item at the end of the edge"""
+  node: accounts!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}
+
+"""An [`async_graphql`] input object for specifying page by cursor"""
+input CursorInput
+  @join__type(graph: ACCOUNTS)
+  @join__type(graph: REVIEWS)
+{
+  after: String
+  before: String
+  first: Int
+  last: Int
+}
+
+scalar join__FieldSet
+
+enum join__Graph {
+  ACCOUNTS @join__graph(name: "accounts", url: "http://localhost:80")
+  REVIEWS @join__graph(name: "reviews", url: "http://localhost:82")
+}
+
+scalar link__Import
+
+enum link__Purpose {
+  """
+  `SECURITY` features provide metadata necessary to securely resolve fields.
+  """
+  SECURITY
+
+  """
+  `EXECUTION` features provide metadata necessary for operation execution.
+  """
+  EXECUTION
+}
+
+type Mutation
+  @join__type(graph: ACCOUNTS)
+  @join__type(graph: REVIEWS)
+{
+  addAccount(username: String!, id: Int!): accounts! @join__field(graph: ACCOUNTS)
+  addReview(id: Int!, body: String!, userId: Int!): reviews! @join__field(graph: REVIEWS)
+}
+
+"""Information about pagination in a connection"""
+type PageInfo
+  @join__type(graph: ACCOUNTS)
+  @join__type(graph: REVIEWS)
+{
+  """When paginating backwards, are there more items?"""
+  hasPreviousPage: Boolean!
+
+  """When paginating forwards, are there more items?"""
+  hasNextPage: Boolean!
+
+  """When paginating backwards, the cursor to continue."""
+  startCursor: String
+
+  """When paginating forwards, the cursor to continue."""
+  endCursor: String
+}
+
+type Query
+  @join__type(graph: ACCOUNTS)
+  @join__type(graph: REVIEWS)
+{
+  accounts(cursor: CursorInput!): accountsConnection! @join__field(graph: ACCOUNTS)
+  account(id: Int!): accounts @join__field(graph: ACCOUNTS)
+  reviews(cursor: CursorInput!): reviewsConnection! @join__field(graph: REVIEWS)
+  review(id: Int!): reviews @join__field(graph: REVIEWS)
+}
+
+type reviews
+  @join__type(graph: REVIEWS)
+{
+  id: Int!
+  body: String!
+  userId: Int!
+}
+
+type reviewsConnection
+  @join__type(graph: REVIEWS)
+{
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [reviewsEdge!]!
+}
+
+"""An edge in a connection."""
+type reviewsEdge
+  @join__type(graph: REVIEWS)
+{
+  """The item at the end of the edge"""
+  node: reviews!
+
+  """A cursor for use in pagination"""
+  cursor: String!
+}

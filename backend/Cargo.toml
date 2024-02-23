@@ -13,7 +13,7 @@ members = [
     "soakdb_io",
     "soakdb_sync",
     "targeting",
-    "the_paginator",
+    "the_paginator", "fed_accounts", "fed_products", "fed_reviews",
 ]
 resolver = "2"
 

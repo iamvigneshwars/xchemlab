@@ -1665,6 +1665,66 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "25cbce373ec4653f1a01a31e8a5e5ec0c622dc27ff9c4e6606eefef5cbbed4a5"
 
 [[package]]
+name = "fed_accounts"
+version = "0.1.0"
+dependencies = [
+ "async-graphql",
+ "axum",
+ "clap 4.5.1",
+ "dotenvy",
+ "graphql_endpoints",
+ "opa_client",
+ "sea-orm",
+ "sea-orm-migration",
+ "the_paginator",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+ "uuid",
+]
+
+[[package]]
+name = "fed_products"
+version = "0.1.0"
+dependencies = [
+ "async-graphql",
+ "axum",
+ "clap 4.5.1",
+ "dotenvy",
+ "graphql_endpoints",
+ "opa_client",
+ "sea-orm",
+ "sea-orm-migration",
+ "the_paginator",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+ "uuid",
+]
+
+[[package]]
+name = "fed_reviews"
+version = "0.1.0"
+dependencies = [
+ "async-graphql",
+ "axum",
+ "clap 4.5.1",
+ "dotenvy",
+ "graphql_endpoints",
+ "opa_client",
+ "sea-orm",
+ "sea-orm-migration",
+ "the_paginator",
+ "tokio",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+ "uuid",
+]
+
+[[package]]
 name = "filetime"
 version = "0.2.23"
 source = "registry+https://github.com/rust-lang/crates.io-index"
