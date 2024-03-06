@@ -1,0 +1,5 @@
+CREATE DATABASE compound_library
+CREATE DATABASE compound_soaking
+CREATE DATABASE crystal_library
+CREATE DATABASE targeting
+CREATE DATABASE pin_packing

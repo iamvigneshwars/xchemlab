@@ -156,6 +156,34 @@ opa-kube-mgmt:
   rbac:
     create: false
 
+postgresql-ha:
+  postgresql:
+    existingSecret: postgres-passwords
+    podAntiAffinityPreset: hard
+    resources:
+      requests:
+        cpu: 500m
+        memory: 512Mi
+      limits:
+        cpu: 2
+        memory: 2Gi
+    initdbScripts: init-script
+
+  pgpool:
+    existingSecret: pgpool-passwords
+    customUsersSecret: application-passwords
+    resources:
+      requests:
+        cpu: 500m
+        memory: 256Mi
+      limits:
+        cpu: 1
+        memory: 512Mi
+
+  persistence:
+    storageClass: db-nvme-storage
+    size: 50Gi
+
 prometheus:
   enabled: true
 
