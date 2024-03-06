@@ -1,0 +1,15 @@
+apiVersion: v1
+data:
+  init.sql: |-
+    CREATE DATABASE compound_library
+    CREATE DATABASE compound_soaking
+    CREATE DATABASE crystal_library
+    CREATE DATABASE targeting
+    CREATE DATABASE pin_packing
+kind: ConfigMap
+metadata:
+  creationTimestamp: "2024-03-06T14:09:35Z"
+  name: init-script
+  namespace: xchemlab
+  resourceVersion: "900365901"
+  uid: 1d0edc7d-f2f6-49d5-9c97-f8052e600104

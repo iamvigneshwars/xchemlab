@@ -44,5 +44,5 @@ dependencies:
 - name: oauth2-proxy
   repository: oci://registry-1.docker.io/bitnamicharts
   version: 3.7.4
-digest: sha256:b7edf34a2e593c11731d86301dc561a51e286142910c18d83c69e0246ff2e393
-generated: "2024-03-06T14:39:02.90407929Z"
+digest: sha256:a634cb025d1c7c8a262ad068b91942e57b3d01fb93c360c280325025c7847a1f
+generated: "2024-03-07T11:33:00.477078341Z"
