@@ -12,7 +12,10 @@ use graphql::{root_schema_builder, RootSchema};
 use graphql_endpoints::{GraphQLHandler, GraphQLSubscription, GraphiQLHandler};
 use migrations::Migrator;
 use opa_client::OPAClient;
-use sea_orm::{ConnectOptions, Database, DatabaseConnection, DbErr, TransactionError};
+use sea_orm::{
+    ConnectOptions, ConnectionTrait, Database, DatabaseConnection, DbErr, Statement,
+    TransactionError,
+};
 use sea_orm_migration::MigratorTrait;
 use std::{
     fs::File,
@@ -41,11 +44,24 @@ fn setup_router(schema: RootSchema) -> Router {
 async fn setup_database(
     mut database_url: Url,
 ) -> Result<DatabaseConnection, TransactionError<DbErr>> {
+    let mut connection_options = ConnectOptions::new(database_url.to_string());
+    let mut connection = Database::connect(connection_options).await?;
     if database_url.path().is_empty() {
         database_url.set_path("pin_packing");
     }
-    let connection_options = ConnectOptions::new(database_url.to_string());
-    let connection = Database::connect(connection_options).await?;
+    // Creates a new database, ignored if database already exists
+    let _db_creation = connection
+        .execute(Statement::from_string(
+            connection.get_database_backend(),
+            format!(
+                "CREATE DATABASE \"{}\";",
+                database_url.path().trim_start_matches('/')
+            ),
+        ))
+        .await;
+    // connects to database path
+    connection_options = ConnectOptions::new(database_url.to_string());
+    connection = Database::connect(connection_options).await?;
     Migrator::up(&connection, None).await?;
     Ok(connection)
 }
