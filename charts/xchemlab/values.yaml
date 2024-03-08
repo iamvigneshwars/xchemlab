@@ -22,44 +22,44 @@ chimp-chomp:
 compound-library:
   enabled: true
   database:
-    host: postgres://postgresql-ha-pgpool
-    user: postgres
+    host: postgres://xchemlab-postgresql-ha-pgpool.xchemlab.svc.cluster.local
+    user: xchemlab
     password:
-      secretName: postgres-passwords
-      secretKey: password
+      secretName: application-passwords
+      secretKey: passwords
   opa:
     url: http://{{ .Release.Name }}-opa-kube-mgmt:8181
 
 compound-soaking:
   enabled: true
   database:
-    host: postgres://postgresql-ha-pgpool
-    user: postgres
+    host: postgres://xchemlab-postgresql-ha-pgpool.xchemlab.svc.cluster.local
+    user: xchemlab
     password:
-      secretName: postgres-passwords
-      secretKey: password
+      secretName: application-passwords
+      secretKey: passwords
   opa:
     url: http://{{ .Release.Name }}-opa-kube-mgmt:8181
 
 crystal-library:
   enabled: true
   database:
-    host: postgres://postgresql-ha-pgpool
-    user: postgres
+    host: postgres://xchemlab-postgresql-ha-pgpool.xchemlab.svc.cluster.local
+    user: xchemlab
     password:
-      secretName: postgres-passwords
-      secretKey: password
+      secretName: application-passwords
+      secretKey: passwords
   opa:
     url: http://{{ .Release.Name }}-opa-kube-mgmt:8181
 
 pin-packing:
   enabled: true
   database:
-    host: postgres://postgresql-ha-pgpool
-    user: postgres
+    host: postgres://xchemlab-postgresql-ha-pgpool.xchemlab.svc.cluster.local
+    user: xchemlab
     password:
-      secretName: postgres-passwords
-      secretKey: password
+      secretName: application-passwords
+      secretKey: passwords
   opa:
     url: http://{{ .Release.Name }}-opa-kube-mgmt:8181
 
@@ -77,11 +77,11 @@ targeting:
       secretName: targeting-s3-secret
       secretKey: secret-access-key
   database:
-    host: postgres://postgresql-ha-pgpool
-    user: postgres
+    host: postgres://xchemlab-postgresql-ha-pgpool.xchemlab.svc.cluster.local
+    user: xchemlab
     password:
-      secretName: postgres-passwords
-      secretKey: password
+      secretName: application-passwords
+      secretKey: passwords
   opa:
     url: http://{{ .Release.Name }}-opa-kube-mgmt:8181
 
@@ -167,7 +167,13 @@ postgresql-ha:
       limits:
         cpu: 2
         memory: 2Gi
-    initdbScripts: init-script
+    initdbScripts:
+      db-init.sql: |
+        SELECT 'CREATE DATABASE compound_library' OWNER xchemlab WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'compound_library')\gexec;
+        SELECT 'CREATE DATABASE compound_soaking' OWNER xchemlab WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'compound_soaking')\gexec;
+        SELECT 'CREATE DATABASE crystal_library' OWNER xchemlab WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'crystal_library')\gexec;
+        SELECT 'CREATE DATABASE targeting' OWNER xchemlab WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'targeting')\gexec;
+        SELECT 'CREATE DATABASE pin_packing' OWNER xchemlab WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname = 'pin_packing')\gexec;
 
   pgpool:
     existingSecret: pgpool-passwords
