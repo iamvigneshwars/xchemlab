@@ -5,12 +5,15 @@ on:
   pull_request:
 
 jobs:
-  generate_schema:
+  generate_and_publish_schema:
     # Deduplicate jobs from pull requests and branch pushes within the same repo.
     if: github.event_name != 'pull_request' || github.event.pull_request.head.repo.full_name != github.repository
     strategy:
       matrix:
         service:
+          - compound_library
+          - compound_soaking
+          - crystal_library
           - soakdb_sync
           - pin_packing
           - targeting
@@ -43,3 +46,13 @@ jobs:
         with:
           name: ${{ matrix.service }}.graphql
           path: ${{ matrix.service }}.graphql
+
+      - name: publish subgraph
+        uses: danielsinclair/rover-setup@v1
+        with:
+          args: subgraph publish xchemlab@current 
+                --routing-url http://${{ matrix.service }}:80 
+                --schema ${{ matrix.service }}.graphql
+                --name ${{ matrix.service }}
+        env:
+          APOLLO_KEY: ${{ secrets.APOLLO_KEY }}
