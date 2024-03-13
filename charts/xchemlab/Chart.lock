@@ -38,11 +38,14 @@ dependencies:
 - name: rabbitmq
   repository: oci://docker.io/bitnamicharts
   version: 12.0.7
+- name: router
+  repository: oci://ghcr.io/apollographql/helm-charts
+  version: 1.41.1
 - name: oauth2-proxy
   repository: oci://registry-1.docker.io/bitnamicharts
   version: 3.7.4
 - name: oauth2-proxy
   repository: oci://registry-1.docker.io/bitnamicharts
   version: 3.7.4
-digest: sha256:a634cb025d1c7c8a262ad068b91942e57b3d01fb93c360c280325025c7847a1f
-generated: "2024-03-07T11:33:00.477078341Z"
+digest: sha256:392add4e5d0d1eadb60a80376f5422e17b58638eb604042e90381aa8a9ce7f71
+generated: "2024-03-13T12:10:55.03395991Z"
